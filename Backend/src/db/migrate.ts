@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 async function migrate(): Promise<void> {
-  const sqlPath = path.join(__dirname, "schema.sql");
+  const sqlPath = path.join(__dirname, "employees.sql");
   const sql = fs.readFileSync(sqlPath, "utf-8");
 
   console.log("Running migrations...");
