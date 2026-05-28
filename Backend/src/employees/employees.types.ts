@@ -34,3 +34,5 @@ export interface EmployeeFilters {
   page?: number;
   pageSize?: number;
 }
+
+export { EmployeeRepository } from "./employee.repository";

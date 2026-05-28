@@ -40,7 +40,7 @@ describe("Employee", () => {
     repo = new EmployeeRepository(mockPool);
   });
 
-  // ─── findAll ────────────────────────────────────────────────────────────────
+  // findAll
 
   describe("findAll", () => {
     it("returns a paginated list of employees with default pagination", async () => {
@@ -112,7 +112,7 @@ describe("Employee", () => {
     });
   });
 
-  // ─── findById ───────────────────────────────────────────────────────────────
+  // findById
 
   describe("findById", () => {
     it("returns an employee when found", async () => {
@@ -135,7 +135,7 @@ describe("Employee", () => {
     });
   });
 
-  // ─── create ─────────────────────────────────────────────────────────────────
+  // create 
 
   describe("create", () => {
     const dto: CreateEmployeeDTO = {
@@ -172,7 +172,7 @@ describe("Employee", () => {
     });
   });
 
-  // ─── update ─────────────────────────────────────────────────────────────────
+  // update 
 
   describe("update", () => {
     it("updates an employee and returns the updated record", async () => {
@@ -206,7 +206,7 @@ describe("Employee", () => {
     });
   });
 
-  // ─── delete ─────────────────────────────────────────────────────────────────
+  // delete 
 
   describe("delete", () => {
     it("returns true when employee is successfully deleted", async () => {
@@ -236,7 +236,7 @@ describe("Employee", () => {
     });
   });
 
-  // ─── findByEmail ─────────────────────────────────────────────────────────────
+  // findByEmail 
 
   describe("findByEmail", () => {
     it("returns an employee matching the email", async () => {
