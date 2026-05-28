@@ -1,39 +1,20 @@
+import fs from "fs";
+import path from "path";
 import { pool } from "./pool";
 import { from as copyFrom } from "pg-copy-streams";
 
 // ─── Reference data ──────────────────────────────────────────────────────────
 
-const FIRST_NAMES = [
-  "James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Michael", "Linda",
-  "William", "Barbara", "David", "Susan", "Richard", "Jessica", "Joseph", "Sarah",
-  "Thomas", "Karen", "Charles", "Lisa", "Christopher", "Nancy", "Daniel", "Betty",
-  "Matthew", "Margaret", "Anthony", "Sandra", "Mark", "Ashley", "Donald", "Dorothy",
-  "Steven", "Kimberly", "Paul", "Emily", "Andrew", "Donna", "Joshua", "Michelle",
-  "Kenneth", "Carol", "Kevin", "Amanda", "Brian", "Melissa", "George", "Deborah",
-  "Timothy", "Stephanie", "Ronald", "Rebecca", "Edward", "Sharon", "Jason", "Laura",
-  "Jeffrey", "Cynthia", "Ryan", "Kathleen", "Jacob", "Amy", "Gary", "Angela",
-  "Nicholas", "Shirley", "Eric", "Anna", "Jonathan", "Brenda", "Stephen", "Pamela",
-  "Larry", "Emma", "Justin", "Nicole", "Scott", "Helen", "Brandon", "Samantha",
-  "Arjun", "Priya", "Ravi", "Ananya", "Vikram", "Deepa", "Aditya", "Pooja",
-  "Wei", "Mei", "Chen", "Fang", "Hao", "Xin", "Jing", "Yun",
-  "Ahmed", "Fatima", "Omar", "Aisha", "Khalid", "Nour", "Hassan", "Sara",
-  "Carlos", "Maria", "Luis", "Ana", "Jorge", "Sofia", "Miguel", "Carmen",
-];
+function loadNames(filename: string): string[] {
+  const filepath = path.join(__dirname, "../../", filename);
+  return fs.readFileSync(filepath, "utf8")
+    .split("\n")
+    .map((n) => n.trim())
+    .filter(Boolean);
+}
 
-const LAST_NAMES = [
-  "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
-  "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
-  "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson",
-  "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson",
-  "Walker", "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen",
-  "Hill", "Flores", "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera",
-  "Campbell", "Mitchell", "Carter", "Roberts", "Patel", "Shah", "Kumar", "Sharma",
-  "Singh", "Gupta", "Mehta", "Kapoor", "Bose", "Iyer", "Reddy", "Nair",
-  "Zhang", "Wang", "Li", "Liu", "Chen", "Yang", "Huang", "Zhou",
-  "Al-Hassan", "Al-Rashid", "Al-Amin", "Mansour", "Khalil", "Aziz",
-  "Müller", "Schmidt", "Schneider", "Fischer", "Weber", "Meyer",
-  "Dupont", "Fontaine", "Bernard", "Petit", "Leroy", "Moreau",
-];
+const FIRST_NAMES = loadNames("first_names.txt");
+const LAST_NAMES  = loadNames("last_names.txt");
 
 const DEPARTMENTS = [
   "Engineering", "Product", "Design", "Marketing", "Sales",
