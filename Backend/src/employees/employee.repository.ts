@@ -7,6 +7,7 @@ import type {
   EmployeeFilters,
 } from "./employees.types";
 import type { IEmployeeRepository } from "./employee.repository.interface";
+import { buildWhere } from "../db/queryHelpers";
 
 type DbRow = {
   id: string;
@@ -54,28 +55,12 @@ export class EmployeeRepository implements IEmployeeRepository {
     const pageSize = filters.pageSize ?? 20;
     const offset = (page - 1) * pageSize;
 
-    const conditions: string[] = [];
-    const params: unknown[] = [];
-
-    if (filters.country) {
-      params.push(filters.country);
-      conditions.push(`country = $${params.length}`);
-    }
-    if (filters.department) {
-      params.push(filters.department);
-      conditions.push(`department = $${params.length}`);
-    }
-    if (filters.jobTitle) {
-      params.push(filters.jobTitle);
-      conditions.push(`job_title = $${params.length}`);
-    }
-    if (filters.search) {
-      params.push(`%${filters.search}%`);
-      conditions.push(`full_name ILIKE $${params.length}`);
-    }
-
-    const where =
-      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+    const { where, params } = buildWhere([
+      filters.country    ? { col: "country",    value: filters.country }                      : null,
+      filters.department ? { col: "department", value: filters.department }                   : null,
+      filters.jobTitle   ? { col: "job_title",  value: filters.jobTitle }                     : null,
+      filters.search     ? { col: "full_name",  value: `%${filters.search}%`, operator: "ILIKE" } : null,
+    ]);
 
     const countResult = await this.pool.query(
       `SELECT COUNT(*) AS total FROM employees ${where}`,
