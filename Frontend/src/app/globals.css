@@ -1,26 +1,102 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4f1ea;
+  --foreground: #1c1f22;
+  --panel: #fffdf8;
+  --panel-subtle: #faf7ef;
+  --line: #ddd5c7;
+  --muted: #6f6b63;
+  --brand: #145a54;
+  --brand-strong: #0f3f3b;
+  --accent: #c06a45;
+  --success: #19745f;
+  --danger: #b14236;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: #c06a4533;
+}
+
+.surface {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 45px rgb(28 31 34 / 8%);
+}
+
+.field {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #fffdf8;
+  color: var(--foreground);
+  border-radius: 8px;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.field:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgb(20 90 84 / 14%);
+}
+
+.field::placeholder {
+  color: #9b9589;
+}
+
+.primary-action {
+  border-radius: 8px;
+  background: var(--brand);
+  color: white;
+  font-weight: 650;
+  transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+  box-shadow: 0 10px 24px rgb(15 63 59 / 18%);
+}
+
+.primary-action:hover {
+  background: var(--brand-strong);
+  transform: translateY(-1px);
+}
+
+.secondary-action {
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #fffdf8;
+  color: var(--foreground);
+  font-weight: 600;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.secondary-action:hover {
+  background: var(--panel-subtle);
+  border-color: #c9beac;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll table {
+  min-width: 920px;
 }

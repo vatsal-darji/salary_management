@@ -57,12 +57,17 @@ export default function EmployeeModal({ employee, onClose, onSave }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 mx-4">
-        <h2 className="text-lg font-semibold mb-4">
-          {employee ? "Edit Employee" : "Add Employee"}
-        </h2>
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1c1f22]/45 p-4 backdrop-blur-sm">
+      <div className="surface w-full max-w-2xl rounded-xl">
+        <div className="border-b border-[var(--line)] px-5 py-4 sm:px-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+            Employee record
+          </p>
+          <h2 className="mt-1 text-xl font-semibold">
+            {employee ? "Edit employee" : "Add employee"}
+          </h2>
+        </div>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 sm:p-6">
           {(
             [
               { key: "fullName", label: "Full Name", type: "text", span: 2 },
@@ -74,8 +79,10 @@ export default function EmployeeModal({ employee, onClose, onSave }: Props) {
               { key: "hireDate", label: "Hire Date", type: "date", span: 1 },
             ] as { key: keyof CreateEmployeeDTO; label: string; type: string; span: 1 | 2 }[]
           ).map(({ key, label, type, span }) => (
-            <div key={key} className={span === 2 ? "col-span-2" : ""}>
-              <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>
+            <div key={key} className={span === 2 ? "sm:col-span-2" : ""}>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+                {label}
+              </label>
               <input
                 type={type}
                 required
@@ -84,29 +91,31 @@ export default function EmployeeModal({ employee, onClose, onSave }: Props) {
                 onChange={(e) =>
                   set(key, type === "number" ? Number(e.target.value) : e.target.value)
                 }
-                className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="field"
               />
             </div>
           ))}
 
           {error && (
-            <p className="col-span-2 text-red-600 text-sm">{error}</p>
+            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--danger)] sm:col-span-2">
+              {error}
+            </p>
           )}
 
-          <div className="col-span-2 flex justify-end gap-3 mt-2">
+          <div className="flex justify-end gap-3 border-t border-[var(--line)] pt-4 sm:col-span-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100"
+              className="secondary-action px-4 py-2 text-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="primary-action px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {saving ? "Saving…" : "Save"}
+              {saving ? "Saving..." : "Save record"}
             </button>
           </div>
         </form>

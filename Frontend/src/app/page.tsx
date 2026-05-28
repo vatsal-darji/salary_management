@@ -12,6 +12,17 @@ const fmt = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
+function StatTile({ label, value, tone = "default" }: { label: string; value: string; tone?: "default" | "accent" }) {
+  return (
+    <div className="surface rounded-xl p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">{label}</p>
+      <p className={`mt-2 text-2xl font-semibold ${tone === "accent" ? "text-[var(--brand)]" : ""}`}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
 export default function EmployeesPage() {
   const [result, setResult] = useState<PaginatedResult<Employee> | null>(null);
   const [filters, setFilters] = useState<EmployeeFilters>({ page: 1, pageSize: 20 });
@@ -52,38 +63,68 @@ export default function EmployeesPage() {
     await load();
   };
 
+  const visibleEmployees = result?.data.length ?? 0;
+  const totalPayroll = result?.data.reduce((sum, emp) => sum + emp.salary, 0) ?? 0;
+  const avgVisibleSalary = visibleEmployees > 0 ? totalPayroll / visibleEmployees : 0;
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Employees</h1>
-          {result && (
-            <p className="text-sm text-gray-500 mt-0.5">
-              {result.total.toLocaleString()} total
-            </p>
-          )}
+    <div className="space-y-5">
+      <section className="grid gap-4 lg:grid-cols-[1fr_360px]">
+        <div className="rounded-xl border border-[var(--line)] bg-[var(--brand)] p-5 text-white shadow-sm sm:p-6">
+          <p className="text-sm font-semibold uppercase tracking-wide text-white/70">People directory</p>
+          <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h1 className="text-3xl font-semibold tracking-tight">Employees</h1>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/74">
+                Maintain compensation records, hiring dates, departments, and regional salary views.
+              </p>
+            </div>
+            <button
+              onClick={() => setModal({ open: true, employee: null })}
+              className="rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-[var(--brand)] shadow-sm transition hover:bg-[#f5eee1]"
+            >
+              Add Employee
+            </button>
+          </div>
         </div>
-        <button
-          onClick={() => setModal({ open: true, employee: null })}
-          className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
-        >
-          + Add Employee
-        </button>
-      </div>
+        <div className="grid grid-cols-2 gap-3">
+          <StatTile label="Total records" value={(result?.total ?? 0).toLocaleString()} tone="accent" />
+          <StatTile label="This page" value={visibleEmployees.toLocaleString()} />
+          <div className="col-span-2">
+            <StatTile label="Avg visible salary" value={fmt.format(avgVisibleSalary)} />
+          </div>
+        </div>
+      </section>
 
       <EmployeeFiltersBar filters={filters} onFiltersChange={setFilters} />
 
-      {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+      {error && (
+        <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-[var(--danger)]">
+          {error}
+        </p>
+      )}
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <section className="surface overflow-hidden rounded-xl">
+        <div className="flex flex-col gap-1 border-b border-[var(--line)] px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-base font-semibold">Compensation roster</h2>
+            <p className="text-sm text-[var(--muted)]">
+              {result ? `${result.page} of ${result.totalPages} pages` : "Loading roster"}
+            </p>
+          </div>
+          <span className="text-sm font-semibold text-[var(--success)]">
+            {fmt.format(totalPayroll)} visible payroll
+          </span>
+        </div>
+        <div className="table-scroll">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-200 text-left">
-              {["Name", "Job Title", "Department", "Country", "Salary", "Hire Date", ""].map(
+            <tr className="border-b border-[var(--line)] bg-[var(--panel-subtle)] text-left">
+              {["Name", "Role", "Department", "Country", "Salary", "Hire Date", "Actions"].map(
                 (h) => (
                   <th
                     key={h}
-                    className="px-4 py-3 font-medium text-gray-600 text-xs uppercase tracking-wide"
+                    className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]"
                   >
                     {h}
                   </th>
@@ -94,13 +135,13 @@ export default function EmployeesPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-gray-400">
-                  Loading…
+                <td colSpan={7} className="px-4 py-16 text-center text-[var(--muted)]">
+                  Loading roster...
                 </td>
               </tr>
             ) : result?.data.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-gray-400">
+                <td colSpan={7} className="px-4 py-16 text-center text-[var(--muted)]">
                   No employees found.
                 </td>
               </tr>
@@ -108,27 +149,34 @@ export default function EmployeesPage() {
               result?.data.map((emp) => (
                 <tr
                   key={emp.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  className="border-b border-[var(--line)]/70 transition-colors last:border-0 hover:bg-[var(--panel-subtle)]"
                 >
-                  <td className="px-4 py-3 font-medium">{emp.fullName}</td>
-                  <td className="px-4 py-3 text-gray-600">{emp.jobTitle}</td>
-                  <td className="px-4 py-3 text-gray-600">{emp.department}</td>
-                  <td className="px-4 py-3 text-gray-600">{emp.country}</td>
-                  <td className="px-4 py-3 font-medium text-green-700">
+                  <td className="px-4 py-3">
+                    <div className="font-semibold">{emp.fullName}</div>
+                    <div className="text-xs text-[var(--muted)]">{emp.email}</div>
+                  </td>
+                  <td className="px-4 py-3 text-[var(--muted)]">{emp.jobTitle}</td>
+                  <td className="px-4 py-3">
+                    <span className="rounded-md border border-[var(--line)] bg-[#fffdf8] px-2 py-1 text-xs font-semibold">
+                      {emp.department}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-[var(--muted)]">{emp.country}</td>
+                  <td className="px-4 py-3 font-semibold text-[var(--success)]">
                     {fmt.format(emp.salary)}
                   </td>
-                  <td className="px-4 py-3 text-gray-500">{emp.hireDate.slice(0, 10)}</td>
+                  <td className="px-4 py-3 text-[var(--muted)]">{emp.hireDate.slice(0, 10)}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2 justify-end">
                       <button
                         onClick={() => setModal({ open: true, employee: emp })}
-                        className="text-blue-600 hover:underline text-xs"
+                        className="secondary-action px-3 py-1.5 text-xs"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => setDeleteId(emp.id)}
-                        className="text-red-500 hover:underline text-xs"
+                        className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-[var(--danger)] transition hover:bg-red-100"
                       >
                         Delete
                       </button>
@@ -139,7 +187,8 @@ export default function EmployeesPage() {
             )}
           </tbody>
         </table>
-      </div>
+        </div>
+      </section>
 
       {result && (
         <Pagination
@@ -158,20 +207,20 @@ export default function EmployeesPage() {
       )}
 
       {deleteId && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl p-6 mx-4 max-w-sm w-full">
-            <h3 className="font-semibold mb-2">Delete employee?</h3>
-            <p className="text-sm text-gray-500 mb-6">This action cannot be undone.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1c1f22]/45 p-4 backdrop-blur-sm">
+          <div className="surface w-full max-w-sm rounded-xl p-6">
+            <h3 className="text-lg font-semibold">Delete employee?</h3>
+            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">This action cannot be undone.</p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setDeleteId(null)}
-                className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100"
+                className="secondary-action px-4 py-2 text-sm"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(deleteId)}
-                className="px-4 py-2 text-sm rounded bg-red-600 text-white hover:bg-red-700"
+                className="rounded-lg bg-[var(--danger)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#8f342b]"
               >
                 Delete
               </button>

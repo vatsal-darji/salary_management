@@ -10,18 +10,30 @@ const links = [
 export default function Navbar() {
   const pathname = usePathname();
   return (
-    <nav className="bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 flex items-center gap-8 h-14">
-        <span className="font-semibold text-blue-700 text-lg">SalaryMgmt</span>
-        <div className="flex gap-6">
+    <nav className="sticky top-0 z-40 border-b border-[var(--line)] bg-[#fffdf8]/90 backdrop-blur">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--brand)] text-sm font-bold text-white shadow-sm">
+            CL
+          </span>
+          <div>
+            <span className="block text-base font-semibold tracking-[0.01em] text-[var(--foreground)]">
+              CompLedger
+            </span>
+            <span className="hidden text-xs text-[var(--muted)] sm:block">
+              Salary operations
+            </span>
+          </div>
+        </div>
+        <div className="flex rounded-lg border border-[var(--line)] bg-[var(--panel-subtle)] p-1">
           {links.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className={`text-sm font-medium pb-0.5 border-b-2 transition-colors ${
+              className={`rounded-md px-3 py-1.5 text-sm font-semibold transition-colors sm:px-4 ${
                 pathname === href
-                  ? "border-blue-600 text-blue-700"
-                  : "border-transparent text-gray-500 hover:text-gray-900"
+                  ? "bg-[var(--panel)] text-[var(--brand)] shadow-sm"
+                  : "text-[var(--muted)] hover:text-[var(--foreground)]"
               }`}
             >
               {label}

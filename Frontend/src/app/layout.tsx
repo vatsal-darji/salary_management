@@ -1,21 +1,20 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 
-const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "Salary Management",
-  description: "HR salary management tool",
+  title: "CompLedger",
+  description: "Salary management workspace",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geist.variable} h-full`}>
-      <body className="min-h-full bg-gray-50 text-gray-900 antialiased">
+    <html lang="en" className="h-full">
+      <body className="min-h-full antialiased">
         <Navbar />
-        <main className="max-w-7xl mx-auto px-4 py-8">{children}</main>
+        <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          {children}
+        </main>
       </body>
     </html>
   );

@@ -26,19 +26,24 @@ const fmt = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
-const PIE_COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
+const CHART_COLORS = ["#145a54", "#c06a45", "#5b6f8c", "#9a6a34", "#6a6256"];
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-      <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
-      <p className="text-xl font-bold mt-1">{value}</p>
+    <div className="surface rounded-xl p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">{label}</p>
+      <p className="mt-2 text-2xl font-semibold">{value}</p>
     </div>
   );
 }
 
-function SectionHeader({ title }: { title: string }) {
-  return <h2 className="text-lg font-semibold mb-4 mt-8">{title}</h2>;
+function SectionHeader({ title, detail }: { title: string; detail: string }) {
+  return (
+    <div className="mb-3 mt-7">
+      <h2 className="text-lg font-semibold">{title}</h2>
+      <p className="mt-1 text-sm text-[var(--muted)]">{detail}</p>
+    </div>
+  );
 }
 
 export default function InsightsPage() {
@@ -65,11 +70,17 @@ export default function InsightsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-400">Loading…</div>
+      <div className="surface flex h-64 items-center justify-center rounded-xl text-[var(--muted)]">
+        Loading insights...
+      </div>
     );
   }
   if (error) {
-    return <p className="text-red-600">{error}</p>;
+    return (
+      <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-[var(--danger)]">
+        {error}
+      </p>
+    );
   }
 
   const totalEmployees = countryStats.reduce((s, c) => s + c.employeeCount, 0);
@@ -81,50 +92,56 @@ export default function InsightsPage() {
   const minSalary = countryStats.reduce((m, c) => Math.min(m, c.minSalary), Infinity);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Salary Insights</h1>
+    <div className="space-y-5">
+      <section className="rounded-xl border border-[var(--line)] bg-[#1c1f22] p-5 text-white shadow-sm sm:p-6">
+        <p className="text-sm font-semibold uppercase tracking-wide text-white/60">Analytics</p>
+        <h1 className="mt-4 text-3xl font-semibold tracking-tight">Salary Insights</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-white/70">
+          Understand compensation ranges by country, department, and salary band.
+        </p>
+      </section>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Total Employees" value={totalEmployees.toLocaleString()} />
         <StatCard label="Overall Avg Salary" value={fmt.format(overallAvg)} />
         <StatCard label="Highest Salary" value={fmt.format(maxSalary)} />
         <StatCard label="Lowest Salary" value={fmt.format(minSalary === Infinity ? 0 : minSalary)} />
       </div>
 
-      {/* Salary by Country */}
-      <SectionHeader title="Average Salary by Country" />
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+      <SectionHeader
+        title="Average Salary by Country"
+        detail="Top countries ranked by mean compensation."
+      />
+      <section className="surface rounded-xl p-4">
         <ResponsiveContainer width="100%" height={320}>
           <BarChart
             data={countryStats.slice(0, 15)}
             margin={{ top: 10, right: 20, left: 20, bottom: 60 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e7ded1" />
             <XAxis
               dataKey="country"
-              tick={{ fontSize: 11 }}
+              tick={{ fontSize: 11, fill: "#6f6b63" }}
               angle={-40}
               textAnchor="end"
               interval={0}
             />
             <YAxis
               tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
-              tick={{ fontSize: 11 }}
+              tick={{ fontSize: 11, fill: "#6f6b63" }}
             />
             <Tooltip formatter={(v) => (typeof v === "number" ? fmt.format(v) : v)} />
-            <Bar dataKey="avgSalary" name="Avg Salary" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="avgSalary" name="Avg Salary" fill="#145a54" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
-      </div>
+      </section>
 
-      {/* Country table */}
-      <div className="mt-4 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <section className="surface table-scroll rounded-xl">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-200 text-left">
+            <tr className="border-b border-[var(--line)] bg-[var(--panel-subtle)] text-left">
               {["Country", "Employees", "Min", "Avg", "Max"].map((h) => (
-                <th key={h} className="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <th key={h} className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
                   {h}
                 </th>
               ))}
@@ -132,72 +149,81 @@ export default function InsightsPage() {
           </thead>
           <tbody>
             {countryStats.map((row) => (
-              <tr key={row.country} className="border-b border-gray-100 hover:bg-gray-50">
-                <td className="px-4 py-2 font-medium">{row.country}</td>
-                <td className="px-4 py-2 text-gray-600">{row.employeeCount}</td>
-                <td className="px-4 py-2 text-gray-600">{fmt.format(row.minSalary)}</td>
-                <td className="px-4 py-2 font-medium text-blue-700">{fmt.format(row.avgSalary)}</td>
-                <td className="px-4 py-2 text-gray-600">{fmt.format(row.maxSalary)}</td>
+              <tr key={row.country} className="border-b border-[var(--line)]/70 last:border-0 hover:bg-[var(--panel-subtle)]">
+                <td className="px-4 py-3 font-semibold">{row.country}</td>
+                <td className="px-4 py-3 text-[var(--muted)]">{row.employeeCount}</td>
+                <td className="px-4 py-3 text-[var(--muted)]">{fmt.format(row.minSalary)}</td>
+                <td className="px-4 py-3 font-semibold text-[var(--brand)]">{fmt.format(row.avgSalary)}</td>
+                <td className="px-4 py-3 text-[var(--muted)]">{fmt.format(row.maxSalary)}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
+      </section>
 
-      {/* Salary by Department */}
-      <SectionHeader title="Average Salary by Department" />
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+      <SectionHeader
+        title="Average Salary by Department"
+        detail="Department-level benchmark for compensation planning."
+      />
+      <section className="surface rounded-xl p-4">
         <ResponsiveContainer width="100%" height={300}>
           <BarChart
             data={deptStats}
             layout="vertical"
             margin={{ top: 10, right: 40, left: 120, bottom: 10 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e7ded1" horizontal={false} />
             <XAxis
               type="number"
               tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
-              tick={{ fontSize: 11 }}
+              tick={{ fontSize: 11, fill: "#6f6b63" }}
             />
-            <YAxis dataKey="department" type="category" tick={{ fontSize: 11 }} width={110} />
+            <YAxis dataKey="department" type="category" tick={{ fontSize: 11, fill: "#6f6b63" }} width={110} />
             <Tooltip formatter={(v) => (typeof v === "number" ? fmt.format(v) : v)} />
-            <Bar dataKey="avgSalary" name="Avg Salary" fill="#10b981" radius={[0, 4, 4, 0]} />
+            <Bar dataKey="avgSalary" name="Avg Salary" fill="#c06a45" radius={[0, 6, 6, 0]} />
           </BarChart>
         </ResponsiveContainer>
-      </div>
+      </section>
 
-      {/* Salary Distribution */}
-      <SectionHeader title="Salary Distribution" />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex items-center justify-center">
-          <ResponsiveContainer width="100%" height={280}>
+      <SectionHeader
+        title="Salary Distribution"
+        detail="Headcount share across compensation bands."
+      />
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <section className="surface rounded-xl p-4">
+          <ResponsiveContainer width="100%" height={320}>
             <PieChart>
               <Pie
                 data={distribution}
                 dataKey="count"
                 nameKey="range"
                 cx="50%"
-                cy="50%"
-                outerRadius={100}
-                label={({ name, value }) => `${name} (${value})`}
-                labelLine={false}
+                cy="44%"
+                innerRadius={58}
+                outerRadius={94}
+                paddingAngle={2}
               >
                 {distribution.map((_, i) => (
-                  <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                  <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                 ))}
               </Pie>
-              <Legend />
+              <Legend
+                verticalAlign="bottom"
+                align="center"
+                iconType="square"
+                wrapperStyle={{ color: "#4a4640", fontSize: 13, paddingTop: 16 }}
+              />
               <Tooltip formatter={(v) => `${v} employees`} />
             </PieChart>
           </ResponsiveContainer>
-        </div>
+        </section>
 
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <section className="surface overflow-hidden rounded-xl">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200 text-left">
+              <tr className="border-b border-[var(--line)] bg-[var(--panel-subtle)] text-left">
                 {["Range", "Employees", "% of Total"].map((h) => (
-                  <th key={h} className="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  <th key={h} className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
                     {h}
                   </th>
                 ))}
@@ -205,21 +231,21 @@ export default function InsightsPage() {
             </thead>
             <tbody>
               {distribution.map((row, i) => (
-                <tr key={row.range} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="px-4 py-2 flex items-center gap-2">
+                <tr key={row.range} className="border-b border-[var(--line)]/70 last:border-0 hover:bg-[var(--panel-subtle)]">
+                  <td className="flex items-center gap-2 px-4 py-3">
                     <span
                       className="inline-block w-2.5 h-2.5 rounded-full"
-                      style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }}
+                      style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
                     />
                     {row.range}
                   </td>
-                  <td className="px-4 py-2 font-medium">{row.count.toLocaleString()}</td>
-                  <td className="px-4 py-2 text-gray-600">{row.percentage}%</td>
+                  <td className="px-4 py-3 font-semibold">{row.count.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-[var(--muted)]">{row.percentage}%</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+        </section>
       </div>
     </div>
   );
